@@ -10,7 +10,7 @@ public class Navis {
 
         System.out.println("Hello! I'm Navis\n" + logo);
         System.out.println("What can I do for you?");
-        System.out.println("________________________________");
+        System.out.println("______________________");
         System.out.println("Bye. Hope to see you again soon!");
         System.out.println("________________________________");
     }
