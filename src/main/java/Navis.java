@@ -8,15 +8,16 @@ public class Navis {
     private final boolean[] isDone = new boolean[MAX_TASKS];
     private int taskCount = 0;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         new Navis().run();
     }
+
     private void run() {
         Scanner scanner = new Scanner(System.in);
 
         printGreeting();
 
-        while(true) {
+        while (true) {
             String input = scanner.nextLine().trim();
 
             if (input.equals("bye")) {
@@ -29,12 +30,12 @@ public class Navis {
                 continue;
             }
 
-            if (input.startsWith("mark ")){
+            if (input.startsWith("mark ")) {
                 handleMarkCommand(input, true);
                 continue;
             }
 
-            if (input.startsWith("unmark ")){
+            if (input.startsWith("unmark ")) {
                 handleMarkCommand(input, false);
                 continue;
             }
@@ -54,8 +55,8 @@ public class Navis {
                         + "N   N   A   A     V     IIIII   SSSSS\n";
 
         System.out.println(LINE);
-        System.out.println("Hello! I'm Navis\n" + logo);
-        System.out.println("What can I do for you?");
+        System.out.println(" Hello! I'm Navis\n" + logo);
+        System.out.println(" What can I do for you?");
         System.out.println(LINE);
     }
 
@@ -65,7 +66,7 @@ public class Navis {
         System.out.println(LINE);
     }
 
-    private void printList(){
+    private void printList() {
         System.out.println(LINE);
         System.out.println(" Here are the tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
@@ -74,14 +75,14 @@ public class Navis {
         System.out.println(LINE);
     }
 
-    private void addTask(String task){
+    private void addTask(String task) {
         if (task.isEmpty()) {
             printMessage(" Please type something.");
             return;
         }
 
-        if (taskCount >= MAX_TASKS){
-            printMessage("Sorry, your task list is full.");
+        if (taskCount >= MAX_TASKS) {
+            printMessage(" Sorry, your task list is full.");
             return;
         }
 
@@ -96,7 +97,7 @@ public class Navis {
 
     private void handleMarkCommand(String input, boolean markAsDone) {
         int index = parseTaskNumber(input);
-        if (index < 0 || index >= taskCount){
+        if (index < 0 || index >= taskCount) {
             printMessage(" Please provide a valid task number.");
             return;
         }
