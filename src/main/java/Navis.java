@@ -4,6 +4,10 @@ public class Navis {
     private static final String LINE = "____________________________________________________________";
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
+        String[] tasks = new String[100];
+        int taskCount = 0;
+
         String logo =
                 "N   N   AAAAA   V   V   IIIII   SSSSS\n"
                         + "NN  N   A   A   V   V     I    S    \n"
@@ -26,8 +30,20 @@ public class Navis {
                 break;
             }
 
+            if (input.equals("list")) {
+                System.out.println(LINE);
+                for (int i = 0; i < taskCount; i++){
+                    System.out.println(" " + (i+1) + ". " + tasks[i]);
+                }
+                System.out.println(LINE);
+                continue;
+            }
+
+            tasks[taskCount] = input;
+            taskCount++;
+
             System.out.println(LINE);
-            System.out.println(" "+input);
+            System.out.println(" added: "+ input);
             System.out.println(LINE);
         }
 
