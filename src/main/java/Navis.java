@@ -3,6 +3,11 @@ import java.util.Scanner;
 public class Navis {
     private static final String LINE = "____________________________________________________________";
     private static final int MAX_TASKS = 100;
+    private static final String TODO_COMMAND = "todo ";
+    private static final String DEADLINE_COMMAND = "deadline ";
+    private static final String EVENT_COMMAND = "event ";
+    private static final String MARK_COMMAND = "mark ";
+    private static final String UNMARK_COMMAND = "unmark ";
 
     private final Task[] tasks = new Task[MAX_TASKS];
     private int taskCount = 0;
@@ -13,49 +18,30 @@ public class Navis {
 
     private void run() {
         Scanner scanner = new Scanner(System.in);
-
         printGreeting();
 
-        while (true) {
+        boolean isRunning = true;
+        while (isRunning) {
             String input = scanner.nextLine().trim();
 
             if (input.equals("bye")) {
                 printBye();
-                break;
-            }
-
-            if (input.equals("list")) {
+                isRunning = false;
+            } else if (input.equals("list")) {
                 printList();
-                continue;
-            }
-
-            if (input.startsWith("mark ")) {
+            } else if (input.startsWith(MARK_COMMAND)) {
                 handleMarkCommand(input, true);
-                continue;
-            }
-
-            if (input.startsWith("unmark ")) {
+            } else if (input.startsWith(UNMARK_COMMAND)) {
                 handleMarkCommand(input, false);
-                continue;
-            }
-
-            if (input.startsWith("todo ")) {
+            } else if (input.startsWith(TODO_COMMAND)) {
                 handleTodo(input);
-                continue;
-            }
-
-            if (input.startsWith("deadline ")) {
+            } else if (input.startsWith(DEADLINE_COMMAND)) {
                 handleDeadline(input);
-                continue;
-            }
-
-            if (input.startsWith("event ")) {
+            } else if (input.startsWith(EVENT_COMMAND)) {
                 handleEvent(input);
-                continue;
+            } else {
+                printMessage(" Sorry, I don't know what that means.");
             }
-
-            // Optional: keep old Level-2 behavior (anything else becomes a Todo)
-            addTask(new Todo(input));
         }
 
         scanner.close();
@@ -84,16 +70,17 @@ public class Navis {
     }
 
     private void handleTodo(String input) {
-        String description = input.substring("todo ".length()).trim();
+        String description = input.substring(TODO_COMMAND.length()).trim();
         if (description.isEmpty()) {
             printMessage(" The description of a todo cannot be empty.");
             return;
         }
+
         addTask(new Todo(description));
     }
 
     private void handleDeadline(String input) {
-        String remainder = input.substring("deadline ".length()).trim();
+        String remainder = input.substring(DEADLINE_COMMAND.length()).trim();
         String[] parts = remainder.split("\\s+/by\\s+", 2);
 
         if (parts.length < 2) {
@@ -113,7 +100,7 @@ public class Navis {
     }
 
     private void handleEvent(String input) {
-        String remainder = input.substring("event ".length()).trim();
+        String remainder = input.substring(EVENT_COMMAND.length()).trim();
 
         int fromIndex = remainder.indexOf(" /from ");
         int toIndex = remainder.indexOf(" /to ");
@@ -190,8 +177,6 @@ public class Navis {
         System.out.println(LINE);
     }
 
-    // ===== Task classes (A-Inheritance) =====
-
     private static class Task {
         private final String description;
         private boolean isDone;
@@ -214,17 +199,21 @@ public class Navis {
         }
 
         protected String getTypeIcon() {
-            return "[?]"; // overridden in subclasses
+            return "[?]";
+        }
+
+        protected String getDetails() {
+            return "";
         }
 
         @Override
         public String toString() {
-            return getTypeIcon() + getStatusIcon() + " " + description;
+            return getTypeIcon() + getStatusIcon() + " " + description + getDetails();
         }
     }
 
     private static class Todo extends Task {
-        public Todo(String description) {
+        protected Todo(String description) {
             super(description);
         }
 
@@ -237,7 +226,7 @@ public class Navis {
     private static class Deadline extends Task {
         private final String by;
 
-        public Deadline(String description, String by) {
+        protected Deadline(String description, String by) {
             super(description);
             this.by = by;
         }
@@ -248,8 +237,8 @@ public class Navis {
         }
 
         @Override
-        public String toString() {
-            return getTypeIcon() + getStatusIcon() + " " + getDescription() + " (by: " + by + ")";
+        protected String getDetails() {
+            return " (by: " + by + ")";
         }
     }
 
@@ -257,7 +246,7 @@ public class Navis {
         private final String from;
         private final String to;
 
-        public Event(String description, String from, String to) {
+        protected Event(String description, String from, String to) {
             super(description);
             this.from = from;
             this.to = to;
@@ -269,9 +258,8 @@ public class Navis {
         }
 
         @Override
-        public String toString() {
-            return getTypeIcon() + getStatusIcon() + " " + getDescription()
-                    + " (from: " + from + " to: " + to + ")";
+        protected String getDetails() {
+            return " (from: " + from + " to: " + to + ")";
         }
     }
 }
