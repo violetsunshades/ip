@@ -1,4 +1,11 @@
+package navis;
+
 import java.util.Scanner;
+
+import navis.exception.NavisException;
+import navis.task.*;
+import navis.storage.TaskList;
+import navis.ui.Ui;
 
 public class Navis {
     private static final String TODO_COMMAND = "todo";
@@ -8,7 +15,7 @@ public class Navis {
     private static final String UNMARK_COMMAND = "unmark";
     private static final String LIST_COMMAND = "list";
     private static final String BYE_COMMAND = "bye";
-
+    private static final String DELETE_COMMAND = "delete";
     private final Ui ui;
     private final TaskList taskList;
 
@@ -54,6 +61,8 @@ public class Navis {
             handleDeadline(input);
         } else if (input.startsWith(EVENT_COMMAND)) {
             handleEvent(input);
+        } else if (input.startsWith(DELETE_COMMAND)) {
+            handleDelete(input);
         } else {
             throw new NavisException(" I'm sorry, but I don't know what that means :-(");
         }
@@ -118,6 +127,12 @@ public class Navis {
         int index = parseTaskNumber(input);
         taskList.markTask(index, markAsDone);
         ui.showTaskMarked(taskList.getTask(index), markAsDone);
+    }
+
+    private void handleDelete(String input) throws NavisException {
+        int index = parseTaskNumber(input);
+        Task deletedTask = taskList.deleteTask(index);
+        ui.showTaskDeleted(deletedTask, taskList.getTaskCount());
     }
 
     private int parseTaskNumber(String input) {

@@ -1,3 +1,7 @@
+package navis.ui;
+
+import navis.task.Task;
+
 public class Ui {
     private static final String LINE = "____________________________________________________________";
 
@@ -47,4 +51,14 @@ public class Ui {
         }
         System.out.println(LINE);
     }
+
+    public void showTaskDeleted(Task task, int taskCount) {
+        System.out.println(LINE);
+        System.out.println(" Noted. I've removed this task:");
+        System.out.println("   " + task);
+        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        System.out.println(LINE);
+    }
+
 }
+
