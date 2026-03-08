@@ -7,5 +7,4 @@ D | 0 | return book | 10:30
 T | 0 | read book
 T | 0 | read book
 T | 0 | wash clothes
-D | 0 | return book | Sunday
 E | 0 | book club meeting | 2pm | 4pm
