@@ -62,10 +62,14 @@ public class Ui {
 
     public void showFoundTasks(Task[] matches) {
         System.out.println(LINE);
-        System.out.println(" Here are the matching tasks in your list:");
 
-        for (int i = 0; i < matches.length; i++) {
-            System.out.println(" " + (i + 1) + "." + matches[i]);
+        if (matches.length == 0) {
+            System.out.println(" No matching tasks found.");
+        } else {
+            System.out.println(" Here are the matching tasks in your list:");
+            for (int i = 0; i < matches.length; i++) {
+                System.out.println(" " + (i + 1) + "." + matches[i]);
+            }
         }
 
         System.out.println(LINE);
