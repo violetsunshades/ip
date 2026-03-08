@@ -14,6 +14,19 @@ public class TaskList {
         this.taskCount = 0;
     }
 
+    public TaskList(Task[] loadedTasks) {
+        this.tasks = new Task[MAX_TASKS];
+        this.taskCount = 0;
+
+        for (Task task : loadedTasks) {
+            if (task == null) {
+                break;
+            }
+            this.tasks[taskCount] = task;
+            taskCount++;
+        }
+    }
+
     public void addTask(Task task) throws NavisException {
         if (taskCount >= MAX_TASKS) {
             throw new NavisException(" Sorry, your task list is full.");
