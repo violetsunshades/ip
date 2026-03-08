@@ -1,10 +1,15 @@
 package navis;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 import navis.exception.NavisException;
-import navis.task.*;
+import navis.storage.Storage;
 import navis.storage.TaskList;
+import navis.task.Deadline;
+import navis.task.Event;
+import navis.task.Task;
+import navis.task.Todo;
 import navis.ui.Ui;
 
 public class Navis {
@@ -13,19 +18,40 @@ public class Navis {
     private static final String EVENT_COMMAND = "event";
     private static final String MARK_COMMAND = "mark";
     private static final String UNMARK_COMMAND = "unmark";
+    private static final String DELETE_COMMAND = "delete";
     private static final String LIST_COMMAND = "list";
     private static final String BYE_COMMAND = "bye";
 
     private final Ui ui;
     private final TaskList taskList;
+    private final Storage storage;
 
     public Navis() {
         this.ui = new Ui();
-        this.taskList = new TaskList();
+        this.storage = new Storage("data/navis.txt");
+        this.taskList = loadTaskList();
     }
 
     public static void main(String[] args) {
         new Navis().run();
+    }
+
+    private TaskList loadTaskList() {
+        try {
+            Task[] loadedTasks = storage.loadTasks();
+            return new TaskList(loadedTasks);
+        } catch (IOException e) {
+            ui.showError(" Error loading file: " + e.getMessage());
+            return new TaskList();
+        }
+    }
+
+    private void saveTasks() throws NavisException {
+        try {
+            storage.saveTasks(taskList.getTasks(), taskList.getTaskCount());
+        } catch (IOException e) {
+            throw new NavisException(" Error saving file: " + e.getMessage());
+        }
     }
 
     private void run() {
@@ -61,6 +87,8 @@ public class Navis {
             handleDeadline(input);
         } else if (input.startsWith(EVENT_COMMAND)) {
             handleEvent(input);
+        } else if (input.startsWith(DELETE_COMMAND)) {
+            handleDelete(input);
         } else {
             throw new NavisException(" I'm sorry, but I don't know what that means :-(");
         }
@@ -75,6 +103,7 @@ public class Navis {
 
         Task task = new Todo(description);
         taskList.addTask(task);
+        saveTasks();
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
@@ -95,6 +124,7 @@ public class Navis {
 
         Task task = new Deadline(description, by);
         taskList.addTask(task);
+        saveTasks();
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
@@ -118,13 +148,22 @@ public class Navis {
 
         Task task = new Event(description, from, to);
         taskList.addTask(task);
+        saveTasks();
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
     private void handleMarkCommand(String input, boolean markAsDone) throws NavisException {
         int index = parseTaskNumber(input);
         taskList.markTask(index, markAsDone);
+        saveTasks();
         ui.showTaskMarked(taskList.getTask(index), markAsDone);
+    }
+
+    private void handleDelete(String input) throws NavisException {
+        int index = parseTaskNumber(input);
+        Task deletedTask = taskList.deleteTask(index);
+        saveTasks();
+        ui.showTaskDeleted(deletedTask, taskList.getTaskCount());
     }
 
     private int parseTaskNumber(String input) {

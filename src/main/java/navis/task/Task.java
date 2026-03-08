@@ -13,12 +13,14 @@ public class Task {
         this.isDone = isDone;
     }
 
-    protected String getStatusIcon() {
-        return isDone ? "[X]" : "[ ]";
+    public boolean isDone() { return isDone; }
+
+    public String getDescription() {
+        return description;
     }
 
-    protected String getDescription() {
-        return description;
+    protected String getStatusIcon() {
+        return isDone ? "[X]" : "[ ]";
     }
 
     protected String getTypeIcon() {
