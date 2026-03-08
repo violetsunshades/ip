@@ -30,6 +30,23 @@ public class TaskList {
         tasks[index].setDone(markAsDone);
     }
 
+    public Task deleteTask(int index) throws NavisException {
+        if (!isValidIndex(index)) {
+            throw new NavisException(" Please provide a valid task number.");
+        }
+
+        Task deletedTask = tasks[index];
+
+        for (int i = index; i < taskCount - 1; i++) {
+            tasks[i] = tasks[i + 1];
+        }
+
+        tasks[taskCount - 1] = null;
+        taskCount--;
+
+        return deletedTask;
+    }
+
     public boolean isValidIndex(int index) {
         return index >= 0 && index < taskCount;
     }
