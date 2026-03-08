@@ -3,6 +3,7 @@ package navis.storage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 import navis.task.Deadline;
@@ -11,17 +12,16 @@ import navis.task.Task;
 import navis.task.Todo;
 
 /**
- * Handles loading tasks from and saving tasks to a file.
- * This class is responsible for persistent storage of tasks
- * used by the Navis application.
+ * Handles loading and saving tasks to a file.
  */
 public class Storage {
+
     private final String filePath;
 
     /**
-     * Creates a storage object that manages the file at the given path.
+     * Creates a Storage object with the specified file path.
      *
-     * @param filePath The path of the file used to store tasks.
+     * @param filePath Path to the storage file.
      */
     public Storage(String filePath) {
         this.filePath = filePath;
@@ -29,10 +29,9 @@ public class Storage {
 
     /**
      * Loads tasks from the storage file.
-     * If the file does not exist, it will be created and an empty task array is returned.
      *
-     * @return An array of tasks loaded from the file.
-     * @throws IOException If an error occurs while reading the file.
+     * @return An array of loaded tasks.
+     * @throws IOException If the file cannot be read.
      */
     public Task[] loadTasks() throws IOException {
         File file = new File(filePath);
@@ -69,7 +68,7 @@ public class Storage {
                 task = new Todo(description);
                 break;
             case "D":
-                task = new Deadline(description, parts[3]);
+                task = new Deadline(description, LocalDate.parse(parts[3]));
                 break;
             case "E":
                 task = new Event(description, parts[3], parts[4]);
@@ -90,9 +89,9 @@ public class Storage {
     /**
      * Saves tasks to the storage file.
      *
-     * @param tasks The array containing tasks to be saved.
-     * @param taskCount The number of valid tasks in the array.
-     * @throws IOException If an error occurs while writing to the file.
+     * @param tasks Array of tasks.
+     * @param taskCount Number of valid tasks.
+     * @throws IOException If writing to file fails.
      */
     public void saveTasks(Task[] tasks, int taskCount) throws IOException {
         File file = new File(filePath);
@@ -107,15 +106,22 @@ public class Storage {
             Task task = tasks[i];
 
             if (task instanceof Todo) {
-                writer.write("T | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription() + System.lineSeparator());
+                writer.write("T | " + (task.isDone() ? "1" : "0")
+                        + " | " + task.getDescription()
+                        + System.lineSeparator());
             } else if (task instanceof Deadline) {
                 Deadline deadline = (Deadline) task;
-                writer.write("D | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription()
-                        + " | " + deadline.getBy() + System.lineSeparator());
+                writer.write("D | " + (task.isDone() ? "1" : "0")
+                        + " | " + task.getDescription()
+                        + " | " + deadline.getBy()
+                        + System.lineSeparator());
             } else if (task instanceof Event) {
                 Event event = (Event) task;
-                writer.write("E | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription()
-                        + " | " + event.getFrom() + " | " + event.getTo() + System.lineSeparator());
+                writer.write("E | " + (task.isDone() ? "1" : "0")
+                        + " | " + task.getDescription()
+                        + " | " + event.getFrom()
+                        + " | " + event.getTo()
+                        + System.lineSeparator());
             }
         }
 
