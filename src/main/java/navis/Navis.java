@@ -12,6 +12,8 @@ import navis.task.Task;
 import navis.task.Todo;
 import navis.ui.Ui;
 import navis.parser.Parser;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class Navis {
     private static final String TODO_COMMAND = "todo";
@@ -112,20 +114,25 @@ public class Navis {
         String[] parts = remainder.split("\\s+/by\\s+", 2);
 
         if (parts.length < 2) {
-            throw new NavisException(" Please use: deadline <description> /by <by>");
+            throw new NavisException(" Please use: deadline <description> /by <yyyy-mm-dd>");
         }
 
         String description = parts[0].trim();
-        String by = parts[1].trim();
+        String byString = parts[1].trim();
 
-        if (description.isEmpty() || by.isEmpty()) {
-            throw new NavisException(" Please use: deadline <description> /by <by>");
+        if (description.isEmpty() || byString.isEmpty()) {
+            throw new NavisException(" Please use: deadline <description> /by <yyyy-mm-dd>");
         }
 
-        Task task = new Deadline(description, by);
-        taskList.addTask(task);
-        saveTasks();
-        ui.showTaskAdded(task, taskList.getTaskCount());
+        try {
+            LocalDate byDate = LocalDate.parse(byString);
+            Task task = new Deadline(description, byDate);
+            taskList.addTask(task);
+            saveTasks();
+            ui.showTaskAdded(task, taskList.getTaskCount());
+        } catch (DateTimeParseException e) {
+            throw new NavisException(" Please enter the date in yyyy-mm-dd format.");
+        }
     }
 
     private void handleEvent(String input) throws NavisException {

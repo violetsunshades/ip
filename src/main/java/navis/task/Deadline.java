@@ -1,14 +1,22 @@
 package navis.task;
 
-public class Deadline extends Task {
-    private final String by;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-    public Deadline(String description, String by) {
+public class Deadline extends Task {
+    private static final DateTimeFormatter OUTPUT_FORMAT =
+            DateTimeFormatter.ofPattern("MMM d yyyy");
+
+    private final LocalDate by;
+
+    public Deadline(String description, LocalDate by) {
         super(description);
         this.by = by;
     }
 
-    public String getBy() { return by; }
+    public LocalDate getBy() {
+        return by;
+    }
 
     @Override
     protected String getTypeIcon() {
@@ -17,6 +25,6 @@ public class Deadline extends Task {
 
     @Override
     protected String getDetails() {
-        return " (by: " + by + ")";
+        return " (by: " + by.format(OUTPUT_FORMAT) + ")";
     }
 }
