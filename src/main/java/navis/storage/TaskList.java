@@ -1,27 +1,23 @@
 package navis.storage;
 
-import navis.task.Task;
+import java.util.ArrayList;
+
 import navis.exception.NavisException;
-
-
+import navis.task.Task;
 
 /**
  * Represents a list of tasks managed by the Navis application.
- * This class stores tasks in an array and provides operations
+ * This class stores tasks in an ArrayList and provides operations
  * such as adding, deleting, marking, and searching tasks.
  */
 public class TaskList {
-    private static final int MAX_TASKS = 100;
-
-    private final Task[] tasks;
-    private int taskCount;
+    private final ArrayList<Task> tasks;
 
     /**
      * Creates an empty task list.
      */
     public TaskList() {
-        this.tasks = new Task[MAX_TASKS];
-        this.taskCount = 0;
+        this.tasks = new ArrayList<>();
     }
 
     /**
@@ -30,15 +26,13 @@ public class TaskList {
      * @param loadedTasks Tasks that were previously saved and loaded.
      */
     public TaskList(Task[] loadedTasks) {
-        this.tasks = new Task[MAX_TASKS];
-        this.taskCount = 0;
+        this.tasks = new ArrayList<>();
 
         for (Task task : loadedTasks) {
             if (task == null) {
                 break;
             }
-            this.tasks[taskCount] = task;
-            taskCount++;
+            this.tasks.add(task);
         }
     }
 
@@ -46,15 +40,9 @@ public class TaskList {
      * Adds a task to the task list.
      *
      * @param task The task to be added.
-     * @throws NavisException If the task list has reached its maximum capacity.
      */
-    public void addTask(Task task) throws NavisException {
-        if (taskCount >= MAX_TASKS) {
-            throw new NavisException(" Sorry, your task list is full.");
-        }
-
-        tasks[taskCount] = task;
-        taskCount++;
+    public void addTask(Task task) {
+        tasks.add(task);
     }
 
     /**
@@ -68,7 +56,7 @@ public class TaskList {
         if (!isValidIndex(index)) {
             throw new NavisException(" Please provide a valid task number.");
         }
-        tasks[index].setDone(markAsDone);
+        tasks.get(index).setDone(markAsDone);
     }
 
     /**
@@ -82,17 +70,7 @@ public class TaskList {
         if (!isValidIndex(index)) {
             throw new NavisException(" Please provide a valid task number.");
         }
-
-        Task deletedTask = tasks[index];
-
-        for (int i = index; i < taskCount - 1; i++) {
-            tasks[i] = tasks[i + 1];
-        }
-
-        tasks[taskCount - 1] = null;
-        taskCount--;
-
-        return deletedTask;
+        return tasks.remove(index);
     }
 
     /**
@@ -102,22 +80,15 @@ public class TaskList {
      * @return An array containing tasks that match the keyword.
      */
     public Task[] findTasks(String keyword) {
-        Task[] matches = new Task[MAX_TASKS];
-        int matchCount = 0;
+        ArrayList<Task> matches = new ArrayList<>();
 
-        for (int i = 0; i < taskCount; i++) {
-            if (tasks[i].getDescription().toLowerCase().contains(keyword.toLowerCase())) {
-                matches[matchCount] = tasks[i];
-                matchCount++;
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                matches.add(task);
             }
         }
 
-        Task[] result = new Task[matchCount];
-        for (int i = 0; i < matchCount; i++) {
-            result[i] = matches[i];
-        }
-
-        return result;
+        return matches.toArray(new Task[0]);
     }
 
     /**
@@ -127,7 +98,7 @@ public class TaskList {
      * @return True if the index is valid, false otherwise.
      */
     public boolean isValidIndex(int index) {
-        return index >= 0 && index < taskCount;
+        return index >= 0 && index < tasks.size();
     }
 
     /**
@@ -137,16 +108,16 @@ public class TaskList {
      * @return The task at the given index.
      */
     public Task getTask(int index) {
-        return tasks[index];
+        return tasks.get(index);
     }
 
     /**
-     * Returns the underlying array storing all tasks.
+     * Returns all tasks as an array.
      *
      * @return The array of tasks.
      */
     public Task[] getTasks() {
-        return tasks;
+        return tasks.toArray(new Task[0]);
     }
 
     /**
@@ -155,8 +126,6 @@ public class TaskList {
      * @return The number of tasks in the list.
      */
     public int getTaskCount() {
-        return taskCount;
+        return tasks.size();
     }
-
-    
 }
