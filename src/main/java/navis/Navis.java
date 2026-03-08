@@ -11,6 +11,7 @@ import navis.task.Event;
 import navis.task.Task;
 import navis.task.Todo;
 import navis.ui.Ui;
+import navis.parser.Parser;
 
 public class Navis {
     private static final String TODO_COMMAND = "todo";
@@ -152,30 +153,16 @@ public class Navis {
     }
 
     private void handleMarkCommand(String input, boolean markAsDone) throws NavisException {
-        int index = parseTaskNumber(input);
+        int index = Parser.parseTaskNumber(input);
         taskList.markTask(index, markAsDone);
         saveTasks();
         ui.showTaskMarked(taskList.getTask(index), markAsDone);
     }
 
     private void handleDelete(String input) throws NavisException {
-        int index = parseTaskNumber(input);
+        int index = Parser.parseTaskNumber(input);
         Task deletedTask = taskList.deleteTask(index);
         saveTasks();
         ui.showTaskDeleted(deletedTask, taskList.getTaskCount());
-    }
-
-    private int parseTaskNumber(String input) {
-        String[] parts = input.split("\\s+");
-        if (parts.length < 2) {
-            return -1;
-        }
-
-        try {
-            int taskNumber = Integer.parseInt(parts[1]);
-            return taskNumber - 1;
-        } catch (NumberFormatException e) {
-            return -1;
-        }
     }
 }
