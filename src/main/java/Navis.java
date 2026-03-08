@@ -1,11 +1,13 @@
 import java.util.Scanner;
 
 public class Navis {
-    private static final String TODO_COMMAND = "todo ";
-    private static final String DEADLINE_COMMAND = "deadline ";
-    private static final String EVENT_COMMAND = "event ";
-    private static final String MARK_COMMAND = "mark ";
-    private static final String UNMARK_COMMAND = "unmark ";
+    private static final String TODO_COMMAND = "todo";
+    private static final String DEADLINE_COMMAND = "deadline";
+    private static final String EVENT_COMMAND = "event";
+    private static final String MARK_COMMAND = "mark";
+    private static final String UNMARK_COMMAND = "unmark";
+    private static final String LIST_COMMAND = "list";
+    private static final String BYE_COMMAND = "bye";
 
     private final Ui ui;
     private final TaskList taskList;
@@ -26,17 +28,21 @@ public class Navis {
         boolean isRunning = true;
         while (isRunning && scanner.hasNextLine()) {
             String input = scanner.nextLine().trim();
-            isRunning = handleCommand(input);
+            try {
+                isRunning = handleCommand(input);
+            } catch (NavisException e) {
+                ui.showError(e.getMessage());
+            }
         }
 
         scanner.close();
     }
 
-    private boolean handleCommand(String input) {
-        if (input.equals("bye")) {
+    private boolean handleCommand(String input) throws NavisException {
+        if (input.equals(BYE_COMMAND)) {
             ui.showBye();
             return false;
-        } else if (input.equals("list")) {
+        } else if (input.equals(LIST_COMMAND)) {
             ui.showTaskList(taskList.getTasks(), taskList.getTaskCount());
         } else if (input.startsWith(MARK_COMMAND)) {
             handleMarkCommand(input, true);
@@ -49,64 +55,50 @@ public class Navis {
         } else if (input.startsWith(EVENT_COMMAND)) {
             handleEvent(input);
         } else {
-            ui.showMessage(" Sorry, I don't know what that means.");
+            throw new NavisException(" I'm sorry, but I don't know what that means :-(");
         }
         return true;
     }
 
-    private void handleTodo(String input) {
+    private void handleTodo(String input) throws NavisException {
         String description = input.substring(TODO_COMMAND.length()).trim();
         if (description.isEmpty()) {
-            ui.showMessage(" The description of a todo cannot be empty.");
-            return;
+            throw new NavisException(" The description of a todo cannot be empty.");
         }
 
         Task task = new Todo(description);
-        boolean isAdded = taskList.addTask(task);
-        if (!isAdded) {
-            ui.showMessage(" Sorry, your task list is full.");
-            return;
-        }
-
+        taskList.addTask(task);
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
-    private void handleDeadline(String input) {
+    private void handleDeadline(String input) throws NavisException {
         String remainder = input.substring(DEADLINE_COMMAND.length()).trim();
         String[] parts = remainder.split("\\s+/by\\s+", 2);
 
         if (parts.length < 2) {
-            ui.showMessage(" Please use: deadline <description> /by <by>");
-            return;
+            throw new NavisException(" Please use: deadline <description> /by <by>");
         }
 
         String description = parts[0].trim();
         String by = parts[1].trim();
 
         if (description.isEmpty() || by.isEmpty()) {
-            ui.showMessage(" Please use: deadline <description> /by <by>");
-            return;
+            throw new NavisException(" Please use: deadline <description> /by <by>");
         }
 
         Task task = new Deadline(description, by);
-        boolean isAdded = taskList.addTask(task);
-        if (!isAdded) {
-            ui.showMessage(" Sorry, your task list is full.");
-            return;
-        }
-
+        taskList.addTask(task);
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
-    private void handleEvent(String input) {
+    private void handleEvent(String input) throws NavisException {
         String remainder = input.substring(EVENT_COMMAND.length()).trim();
 
         int fromIndex = remainder.indexOf(" /from ");
         int toIndex = remainder.indexOf(" /to ");
 
         if (fromIndex == -1 || toIndex == -1 || toIndex < fromIndex) {
-            ui.showMessage(" Please use: event <description> /from <from> /to <to>");
-            return;
+            throw new NavisException(" Please use: event <description> /from <from> /to <to>");
         }
 
         String description = remainder.substring(0, fromIndex).trim();
@@ -114,30 +106,18 @@ public class Navis {
         String to = remainder.substring(toIndex + " /to ".length()).trim();
 
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            ui.showMessage(" Please use: event <description> /from <from> /to <to>");
-            return;
+            throw new NavisException(" Please use: event <description> /from <from> /to <to>");
         }
 
         Task task = new Event(description, from, to);
-        boolean isAdded = taskList.addTask(task);
-        if (!isAdded) {
-            ui.showMessage(" Sorry, your task list is full.");
-            return;
-        }
-
+        taskList.addTask(task);
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
-    private void handleMarkCommand(String input, boolean markAsDone) {
+    private void handleMarkCommand(String input, boolean markAsDone) throws NavisException {
         int index = parseTaskNumber(input);
-        if (!taskList.isValidIndex(index)) {
-            ui.showMessage(" Please provide a valid task number.");
-            return;
-        }
-
-        Task task = taskList.getTask(index);
-        task.setDone(markAsDone);
-        ui.showTaskMarked(task, markAsDone);
+        taskList.markTask(index, markAsDone);
+        ui.showTaskMarked(taskList.getTask(index), markAsDone);
     }
 
     private int parseTaskNumber(String input) {

@@ -9,14 +9,20 @@ public class TaskList {
         this.taskCount = 0;
     }
 
-    public boolean addTask(Task task) {
+    public void addTask(Task task) throws NavisException {
         if (taskCount >= MAX_TASKS) {
-            return false;
+            throw new NavisException(" Sorry, your task list is full.");
         }
 
         tasks[taskCount] = task;
         taskCount++;
-        return true;
+    }
+
+    public void markTask(int index, boolean markAsDone) throws NavisException {
+        if (!isValidIndex(index)) {
+            throw new NavisException(" Please provide a valid task number.");
+        }
+        tasks[index].setDone(markAsDone);
     }
 
     public boolean isValidIndex(int index) {
