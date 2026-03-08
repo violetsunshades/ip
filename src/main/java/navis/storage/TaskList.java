@@ -65,7 +65,7 @@ public class TaskList {
         int matchCount = 0;
 
         for (int i = 0; i < taskCount; i++) {
-            if (tasks[i].getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+            if (tasks[i].toString().toLowerCase().contains(keyword.toLowerCase())) {
                 matches[matchCount] = tasks[i];
                 matchCount++;
             }
