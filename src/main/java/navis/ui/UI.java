@@ -1,3 +1,7 @@
+package navis.ui;
+
+import navis.task.Task;
+
 public class Ui {
     private static final String LINE = "____________________________________________________________";
 

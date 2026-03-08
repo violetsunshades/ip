@@ -1,3 +1,8 @@
+package navis.storage;
+
+import navis.task.Task;
+import navis.exception.NavisException;
+
 public class TaskList {
     private static final int MAX_TASKS = 100;
 
