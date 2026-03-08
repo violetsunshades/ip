@@ -14,9 +14,9 @@ public class Ui {
         System.out.println(LINE);
     }
 
-    public void showMessage(String message) {
+    public void showError(String message) {
         System.out.println(LINE);
-        System.out.println(message);
+        System.out.println(" OOPS!!!" + message);
         System.out.println(LINE);
     }
 
