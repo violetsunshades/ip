@@ -15,6 +15,10 @@ import navis.parser.Parser;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Represents the main entry point of the Navis application.
+ * Navis is a task management chatbot that helps users manage tasks.
+ */
 public class Navis {
     private static final String TODO_COMMAND = "todo";
     private static final String DEADLINE_COMMAND = "deadline";
@@ -24,20 +28,36 @@ public class Navis {
     private static final String LIST_COMMAND = "list";
     private static final String BYE_COMMAND = "bye";
     private static final String DELETE_COMMAND = "delete";
+    private static final String FIND_COMMAND = "find";
+
     private final Ui ui;
     private final TaskList taskList;
     private final Storage storage;
 
+    /**
+     * Creates a Navis application instance with its UI, storage, and task list.
+     */
     public Navis() {
         this.ui = new Ui();
         this.storage = new Storage("data/navis.txt");
         this.taskList = loadTaskList();
     }
 
+    /**
+     * Launches the Navis application.
+     *
+     * @param args Command-line arguments passed to the program.
+     */
     public static void main(String[] args) {
         new Navis().run();
     }
 
+    /**
+     * Loads tasks from storage and returns them as a task list.
+     * If loading fails, an empty task list is returned instead.
+     *
+     * @return A task list initialized from storage, or an empty task list if loading fails.
+     */
     private TaskList loadTaskList() {
         try {
             Task[] loadedTasks = storage.loadTasks();
@@ -48,6 +68,11 @@ public class Navis {
         }
     }
 
+    /**
+     * Saves the current task list to storage.
+     *
+     * @throws NavisException If an error occurs while saving the tasks.
+     */
     private void saveTasks() throws NavisException {
         try {
             storage.saveTasks(taskList.getTasks(), taskList.getTaskCount());
@@ -56,7 +81,10 @@ public class Navis {
         }
     }
 
-    private void run() {
+    /**
+     * Starts and runs the Navis application loop.
+     */
+    public void run() {
         Scanner scanner = new Scanner(System.in);
         ui.showGreeting();
 
@@ -73,6 +101,13 @@ public class Navis {
         scanner.close();
     }
 
+    /**
+     * Interprets and executes a user command.
+     *
+     * @param input The full command entered by the user.
+     * @return False if the application should terminate, true otherwise.
+     * @throws NavisException If the command is invalid or cannot be executed.
+     */
     private boolean handleCommand(String input) throws NavisException {
         if (input.equals(BYE_COMMAND)) {
             ui.showBye();
@@ -91,12 +126,20 @@ public class Navis {
             handleEvent(input);
         } else if (input.startsWith(DELETE_COMMAND)) {
             handleDelete(input);
+        } else if (input.startsWith(FIND_COMMAND)) {
+            handleFind(input);
         } else {
             throw new NavisException(" I'm sorry, but I don't know what that means :-(");
         }
         return true;
     }
 
+    /**
+     * Processes a todo command and adds a todo task to the task list.
+     *
+     * @param input The full todo command entered by the user.
+     * @throws NavisException If the todo description is empty.
+     */
     private void handleTodo(String input) throws NavisException {
         String description = input.substring(TODO_COMMAND.length()).trim();
         if (description.isEmpty()) {
@@ -109,6 +152,12 @@ public class Navis {
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
+    /**
+     * Processes a deadline command and adds a deadline task to the task list.
+     *
+     * @param input The full deadline command entered by the user.
+     * @throws NavisException If the command format is invalid or missing fields.
+     */
     private void handleDeadline(String input) throws NavisException {
         String remainder = input.substring(DEADLINE_COMMAND.length()).trim();
         String[] parts = remainder.split("\\s+/by\\s+", 2);
@@ -135,6 +184,12 @@ public class Navis {
         }
     }
 
+    /**
+     * Processes an event command and adds an event task to the task list.
+     *
+     * @param input The full event command entered by the user.
+     * @throws NavisException If the command format is invalid or missing fields.
+     */
     private void handleEvent(String input) throws NavisException {
         String remainder = input.substring(EVENT_COMMAND.length()).trim();
 
@@ -159,6 +214,13 @@ public class Navis {
         ui.showTaskAdded(task, taskList.getTaskCount());
     }
 
+    /**
+     * Processes a mark or unmark command and updates the task status.
+     *
+     * @param input The full mark or unmark command entered by the user.
+     * @param markAsDone True to mark the task as done, false to mark it as not done.
+     * @throws NavisException If the task number is invalid or cannot be processed.
+     */
     private void handleMarkCommand(String input, boolean markAsDone) throws NavisException {
         int index = Parser.parseTaskNumber(input);
         taskList.markTask(index, markAsDone);
@@ -166,10 +228,33 @@ public class Navis {
         ui.showTaskMarked(taskList.getTask(index), markAsDone);
     }
 
+    /**
+     * Processes a delete command and removes the specified task.
+     *
+     * @param input The full delete command entered by the user.
+     * @throws NavisException If the task number is invalid or cannot be deleted.
+     */
     private void handleDelete(String input) throws NavisException {
         int index = Parser.parseTaskNumber(input);
         Task deletedTask = taskList.deleteTask(index);
         saveTasks();
         ui.showTaskDeleted(deletedTask, taskList.getTaskCount());
+    }
+
+    /**
+     * Processes a find command and displays tasks matching the keyword.
+     *
+     * @param input The full find command entered by the user.
+     * @throws NavisException If the find keyword is empty.
+     */
+    private void handleFind(String input) throws NavisException {
+        String keyword = input.substring(FIND_COMMAND.length()).trim();
+
+        if (keyword.isEmpty()) {
+            throw new NavisException(" The keyword for find cannot be empty.");
+        }
+
+        Task[] matches = taskList.findTasks(keyword);
+        ui.showFoundTasks(matches);
     }
 }
