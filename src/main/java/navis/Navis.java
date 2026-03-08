@@ -13,6 +13,11 @@ import navis.task.Todo;
 import navis.ui.Ui;
 import navis.parser.Parser;
 
+/**
+ * Represents the main entry point of the Navis application.
+ * Navis is a task management chatbot that helps users manage tasks.
+ */
+
 public class Navis {
     private static final String TODO_COMMAND = "todo";
     private static final String DEADLINE_COMMAND = "deadline";
@@ -34,6 +39,11 @@ public class Navis {
         this.taskList = loadTaskList();
     }
 
+    /**
+     * Launches the Navis application.
+     *
+     * @param args Command-line arguments passed to the program.
+     */
     public static void main(String[] args) {
         new Navis().run();
     }
@@ -56,7 +66,10 @@ public class Navis {
         }
     }
 
-    private void run() {
+    /**
+     * Starts and runs the Navis application loop.
+     */
+    public void run() {
         Scanner scanner = new Scanner(System.in);
         ui.showGreeting();
 
