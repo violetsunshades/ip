@@ -60,6 +60,25 @@ public class TaskList {
         return deletedTask;
     }
 
+    public Task[] findTasks(String keyword) {
+        Task[] matches = new Task[MAX_TASKS];
+        int matchCount = 0;
+
+        for (int i = 0; i < taskCount; i++) {
+            if (tasks[i].getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                matches[matchCount] = tasks[i];
+                matchCount++;
+            }
+        }
+
+        Task[] result = new Task[matchCount];
+        for (int i = 0; i < matchCount; i++) {
+            result[i] = matches[i];
+        }
+
+        return result;
+    }
+
     public boolean isValidIndex(int index) {
         return index >= 0 && index < taskCount;
     }

@@ -2,3 +2,5 @@ T | 1 | read book
 T | 0 | read book
 D | 0 | return book | Sunday
 E | 0 | meeting | 2pm | 4pm
+D | 0 | return book | 2019-10-15
+D | 0 | return book | 10:30

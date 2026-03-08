@@ -22,6 +22,8 @@ public class Navis {
     private static final String LIST_COMMAND = "list";
     private static final String BYE_COMMAND = "bye";
     private static final String DELETE_COMMAND = "delete";
+    private static final String FIND_COMMAND = "find";
+
     private final Ui ui;
     private final TaskList taskList;
     private final Storage storage;
@@ -89,6 +91,8 @@ public class Navis {
             handleEvent(input);
         } else if (input.startsWith(DELETE_COMMAND)) {
             handleDelete(input);
+        } else if (input.startsWith(FIND_COMMAND)) {
+            handleFind(input);
         } else {
             throw new NavisException(" I'm sorry, but I don't know what that means :-(");
         }
@@ -164,5 +168,16 @@ public class Navis {
         Task deletedTask = taskList.deleteTask(index);
         saveTasks();
         ui.showTaskDeleted(deletedTask, taskList.getTaskCount());
+    }
+
+    private void handleFind(String input) throws NavisException {
+        String keyword = input.substring(FIND_COMMAND.length()).trim();
+
+        if (keyword.isEmpty()) {
+            throw new NavisException(" The keyword for find cannot be empty.");
+        }
+
+        Task[] matches = taskList.findTasks(keyword);
+        ui.showFoundTasks(matches);
     }
 }

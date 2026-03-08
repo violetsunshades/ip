@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.time.LocalDate;
 
 import navis.task.Deadline;
 import navis.task.Event;
@@ -65,8 +66,8 @@ public class Storage {
             tasks[index] = task;
             index++;
         }
-        scanner.close();
 
+        scanner.close();
         return tasks;
     }
 
